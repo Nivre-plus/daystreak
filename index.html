@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Day Streak" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <title>Day Streak</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card: rgba(255, 255, 255, 0.09);
+      --card-strong: rgba(255, 255, 255, 0.14);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --muted2: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #a78bfa;
+      --danger: #fb7185;
+      --success: #34d399;
+      --border: rgba(255, 255, 255, 0.14);
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.24), transparent 32rem),
+        radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.24), transparent 28rem),
+        var(--bg);
+      color: var(--text);
+    }
+
+    body {
+      min-height: 100vh;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 440px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: white;
+      font-weight: 900;
+      box-shadow: 0 14px 30px var(--shadow);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin-top: 2px;
+      font-size: 0.82rem;
+      color: var(--muted2);
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card-strong), var(--card));
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 20px;
+      box-shadow: 0 22px 70px var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .streak-name-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    input {
+      width: 100%;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.48);
+      color: var(--text);
+      outline: none;
+      border-radius: 16px;
+      padding: 13px 14px;
+      font-size: 1rem;
+    }
+
+    input::placeholder { color: var(--muted2); }
+
+    .big-number {
+      text-align: center;
+      padding: 20px 10px 16px;
+    }
+
+    .count {
+      font-size: clamp(4.2rem, 19vw, 7.1rem);
+      line-height: 0.9;
+      font-weight: 950;
+      letter-spacing: -0.08em;
+      text-shadow: 0 18px 46px rgba(0, 0, 0, 0.25);
+    }
+
+    .label {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+
+    .status {
+      margin: 14px auto 0;
+      width: fit-content;
+      max-width: 100%;
+      border-radius: 999px;
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.09);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.88rem;
+      text-align: center;
+    }
+
+    .status.done { color: #bbf7d0; background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.28); }
+    .status.missed { color: #fecdd3; background: rgba(251, 113, 133, 0.12); border-color: rgba(251, 113, 133, 0.28); }
+
+    .stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.07);
+      border-radius: 20px;
+      padding: 14px;
+    }
+
+    .stat-title {
+      color: var(--muted2);
+      font-size: 0.78rem;
+      margin-bottom: 5px;
+    }
+
+    .stat-value {
+      font-size: 1.08rem;
+      font-weight: 800;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 18px;
+      padding: 15px 16px;
+      font-weight: 850;
+      font-size: 1rem;
+      color: #06121f;
+      background: linear-gradient(135deg, var(--accent), var(--success));
+      box-shadow: 0 14px 32px rgba(56, 189, 248, 0.2);
+      cursor: pointer;
+    }
+
+    button:active { transform: translateY(1px) scale(0.995); }
+    button:disabled { opacity: 0.62; cursor: not-allowed; }
+
+    .secondary-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .ghost {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .danger {
+      color: #ffe4e6;
+      background: rgba(251, 113, 133, 0.16);
+      border: 1px solid rgba(251, 113, 133, 0.3);
+      box-shadow: none;
+    }
+
+    .hint {
+      margin: 14px 4px 0;
+      color: var(--muted2);
+      font-size: 0.82rem;
+      text-align: center;
+      line-height: 1.45;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      transform: translateX(-50%) translateY(20px);
+      opacity: 0;
+      pointer-events: none;
+      background: rgba(2, 6, 23, 0.86);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 11px 14px;
+      font-size: 0.9rem;
+      transition: opacity 180ms ease, transform 180ms ease;
+      backdrop-filter: blur(12px);
+      max-width: calc(100vw - 36px);
+      text-align: center;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="topbar">
+      <div class="brand">
+        <div class="logo">🔥</div>
+        <div>
+          <h1>Day Streak</h1>
+          <div class="subtitle">Track one daily streak</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Day streak tracker">
+      <div class="streak-name-row">
+        <input id="nameInput" maxlength="36" placeholder="Name your streak" aria-label="Streak name" />
+      </div>
+
+      <div class="big-number">
+        <div id="currentStreak" class="count">0</div>
+        <div id="streakLabel" class="label">current streak days</div>
+        <div id="status" class="status">Not completed today</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-title">Best streak</div>
+          <div id="bestStreak" class="stat-value">0 days</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Last completed</div>
+          <div id="lastCompleted" class="stat-value">Never</div>
+        </div>
+      </div>
+
+      <button id="completeBtn">Mark Today Complete</button>
+
+      <div class="secondary-actions">
+        <button id="undoBtn" class="ghost">Undo Today</button>
+        <button id="resetBtn" class="danger">Reset</button>
+      </div>
+
+      <p class="hint">Your progress saves automatically in this browser. Miss more than one day and your current streak resets when you mark the next day complete.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const STORAGE_KEY = "day-streak-v1";
+    const els = {
+      nameInput: document.getElementById("nameInput"),
+      currentStreak: document.getElementById("currentStreak"),
+      streakLabel: document.getElementById("streakLabel"),
+      bestStreak: document.getElementById("bestStreak"),
+      lastCompleted: document.getElementById("lastCompleted"),
+      completeBtn: document.getElementById("completeBtn"),
+      undoBtn: document.getElementById("undoBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      status: document.getElementById("status"),
+      toast: document.getElementById("toast")
+    };
+
+    const defaultState = {
+      name: "My Streak",
+      current: 0,
+      best: 0,
+      lastCompletedDate: null,
+      history: []
+    };
+
+    let state = loadState();
+
+    function todayKey() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+
+    function parseLocalDate(key) {
+      if (!key) return null;
+      const [year, month, day] = key.split("-").map(Number);
+      return new Date(year, month - 1, day);
+    }
+
+    function daysBetween(aKey, bKey) {
+      const a = parseLocalDate(aKey);
+      const b = parseLocalDate(bKey);
+      if (!a || !b) return null;
+      const msPerDay = 24 * 60 * 60 * 1000;
+      return Math.round((b - a) / msPerDay);
+    }
+
+    function formatDate(key) {
+      if (!key) return "Never";
+      return parseLocalDate(key).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+      });
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return { ...defaultState };
+        return { ...defaultState, ...JSON.parse(raw) };
+      } catch {
+        return { ...defaultState };
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function showToast(message) {
+      els.toast.textContent = message;
+      els.toast.classList.add("show");
+      clearTimeout(showToast.timeout);
+      showToast.timeout = setTimeout(() => els.toast.classList.remove("show"), 1800);
+    }
+
+    function todayCompleted() {
+      return state.lastCompletedDate === todayKey();
+    }
+
+    function render() {
+      const today = todayKey();
+      const gap = daysBetween(state.lastCompletedDate, today);
+      const completed = todayCompleted();
+      const missed = state.lastCompletedDate && gap > 1;
+
+      els.nameInput.value = state.name || "";
+      els.currentStreak.textContent = state.current;
+      els.streakLabel.textContent = state.current === 1 ? "current streak day" : "current streak days";
+      els.bestStreak.textContent = `${state.best} ${state.best === 1 ? "day" : "days"}`;
+      els.lastCompleted.textContent = formatDate(state.lastCompletedDate);
+
+      els.completeBtn.disabled = completed;
+      els.undoBtn.disabled = !completed;
+
+      els.status.className = "status";
+      if (completed) {
+        els.status.textContent = "Completed today";
+        els.status.classList.add("done");
+      } else if (missed) {
+        els.status.textContent = "Streak was missed — complete today to restart";
+        els.status.classList.add("missed");
+      } else {
+        els.status.textContent = "Not completed today";
+      }
+    }
+
+    function completeToday() {
+      const today = todayKey();
+      if (todayCompleted()) {
+        showToast("Today is already completed.");
+        return;
+      }
+
+      const gap = daysBetween(state.lastCompletedDate, today);
+      if (!state.lastCompletedDate) {
+        state.current = 1;
+      } else if (gap === 1) {
+        state.current += 1;
+      } else {
+        state.current = 1;
+      }
+
+      state.best = Math.max(state.best, state.current);
+      state.lastCompletedDate = today;
+      if (!state.history.includes(today)) state.history.push(today);
+      saveState();
+      render();
+      showToast("Streak updated.");
+    }
+
+    function undoToday() {
+      const today = todayKey();
+      if (!todayCompleted()) return;
+
+      state.history = state.history.filter(date => date !== today);
+      const previousDate = state.history[state.history.length - 1] || null;
+      state.lastCompletedDate = previousDate;
+
+      if (!previousDate) {
+        state.current = 0;
+      } else {
+        let current = 1;
+        for (let i = state.history.length - 1; i > 0; i--) {
+          if (daysBetween(state.history[i - 1], state.history[i]) === 1) current += 1;
+          else break;
+        }
+        state.current = current;
+      }
+
+      saveState();
+      render();
+      showToast("Today was undone.");
+    }
+
+    function resetStreak() {
+      const okay = confirm("Reset this streak? This clears current, best, and history.");
+      if (!okay) return;
+      state = { ...defaultState, name: state.name || defaultState.name };
+      saveState();
+      render();
+      showToast("Streak reset.");
+    }
+
+    els.nameInput.addEventListener("input", () => {
+      state.name = els.nameInput.value.trim() || "My Streak";
+      saveState();
+    });
+
+    els.completeBtn.addEventListener("click", completeToday);
+    els.undoBtn.addEventListener("click", undoToday);
+    els.resetBtn.addEventListener("click", resetStreak);
+
+    render();
+
+    if ("serviceWorker" in navigator && location.protocol !== "file:") {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("sw.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
