@@ -4,11 +4,13 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#111827" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="Day Streak" />
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Day Streak</title>
   <style>
     :root {
@@ -31,7 +33,7 @@
     html, body {
       margin: 0;
       min-height: 100%;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background:
         radial-gradient(circle at top left, rgba(56, 189, 248, 0.24), transparent 32rem),
         radial-gradient(circle at bottom right, rgba(167, 139, 250, 0.24), transparent 28rem),
@@ -47,10 +49,7 @@
       justify-content: center;
     }
 
-    .app {
-      width: 100%;
-      max-width: 440px;
-    }
+    .app { width: 100%; max-width: 440px; }
 
     .topbar {
       display: flex;
@@ -60,11 +59,7 @@
       margin-bottom: 16px;
     }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .brand { display: flex; align-items: center; gap: 10px; }
 
     .logo {
       width: 42px;
@@ -78,17 +73,21 @@
       box-shadow: 0 14px 30px var(--shadow);
     }
 
-    h1 {
-      margin: 0;
-      font-size: 1.2rem;
-      letter-spacing: -0.03em;
+    h1 { margin: 0; font-size: 1.2rem; letter-spacing: -0.03em; }
+    .subtitle { margin-top: 2px; font-size: 0.82rem; color: var(--muted2); }
+
+    .connection {
+      border: 1px solid var(--border);
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 7px 10px;
+      font-size: 0.75rem;
+      white-space: nowrap;
     }
 
-    .subtitle {
-      margin-top: 2px;
-      font-size: 0.82rem;
-      color: var(--muted2);
-    }
+    .connection.offline { color: #fecdd3; background: rgba(251, 113, 133, 0.12); border-color: rgba(251, 113, 133, 0.3); }
+    .connection.ready { color: #bbf7d0; background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.3); }
 
     .card {
       background: linear-gradient(180deg, var(--card-strong), var(--card));
@@ -99,12 +98,7 @@
       backdrop-filter: blur(16px);
     }
 
-    .streak-name-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 18px;
-    }
+    .streak-name-row { display: flex; gap: 10px; align-items: center; margin-bottom: 18px; }
 
     input {
       width: 100%;
@@ -119,10 +113,7 @@
 
     input::placeholder { color: var(--muted2); }
 
-    .big-number {
-      text-align: center;
-      padding: 20px 10px 16px;
-    }
+    .big-number { text-align: center; padding: 20px 10px 16px; }
 
     .count {
       font-size: clamp(4.2rem, 19vw, 7.1rem);
@@ -132,11 +123,7 @@
       text-shadow: 0 18px 46px rgba(0, 0, 0, 0.25);
     }
 
-    .label {
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 1rem;
-    }
+    .label { margin-top: 10px; color: var(--muted); font-size: 1rem; }
 
     .status {
       margin: 14px auto 0;
@@ -154,30 +141,11 @@
     .status.done { color: #bbf7d0; background: rgba(52, 211, 153, 0.12); border-color: rgba(52, 211, 153, 0.28); }
     .status.missed { color: #fecdd3; background: rgba(251, 113, 133, 0.12); border-color: rgba(251, 113, 133, 0.28); }
 
-    .stats {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 18px 0;
-    }
+    .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
 
-    .stat {
-      border: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.07);
-      border-radius: 20px;
-      padding: 14px;
-    }
-
-    .stat-title {
-      color: var(--muted2);
-      font-size: 0.78rem;
-      margin-bottom: 5px;
-    }
-
-    .stat-value {
-      font-size: 1.08rem;
-      font-weight: 800;
-    }
+    .stat { border: 1px solid var(--border); background: rgba(255, 255, 255, 0.07); border-radius: 20px; padding: 14px; }
+    .stat-title { color: var(--muted2); font-size: 0.78rem; margin-bottom: 5px; }
+    .stat-value { font-size: 1.08rem; font-weight: 800; }
 
     button {
       width: 100%;
@@ -195,34 +163,12 @@
     button:active { transform: translateY(1px) scale(0.995); }
     button:disabled { opacity: 0.62; cursor: not-allowed; }
 
-    .secondary-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 10px;
-    }
+    .secondary-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 
-    .ghost {
-      color: var(--text);
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid var(--border);
-      box-shadow: none;
-    }
+    .ghost { color: var(--text); background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); box-shadow: none; }
+    .danger { color: #ffe4e6; background: rgba(251, 113, 133, 0.16); border: 1px solid rgba(251, 113, 133, 0.3); box-shadow: none; }
 
-    .danger {
-      color: #ffe4e6;
-      background: rgba(251, 113, 133, 0.16);
-      border: 1px solid rgba(251, 113, 133, 0.3);
-      box-shadow: none;
-    }
-
-    .hint {
-      margin: 14px 4px 0;
-      color: var(--muted2);
-      font-size: 0.82rem;
-      text-align: center;
-      line-height: 1.45;
-    }
+    .hint { margin: 14px 4px 0; color: var(--muted2); font-size: 0.82rem; text-align: center; line-height: 1.45; }
 
     .toast {
       position: fixed;
@@ -243,10 +189,7 @@
       text-align: center;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   </style>
 </head>
 <body>
@@ -259,11 +202,12 @@
           <div class="subtitle">Track one daily streak</div>
         </div>
       </div>
+      <div id="connection" class="connection">Checking offline</div>
     </section>
 
-    <section class="card" aria-label="Day streak tracker">
+    <section class="card">
       <div class="streak-name-row">
-        <input id="nameInput" maxlength="36" placeholder="Name your streak" aria-label="Streak name" />
+        <input id="nameInput" maxlength="36" autocomplete="off" placeholder="Name your streak" />
       </div>
 
       <div class="big-number">
@@ -290,26 +234,14 @@
         <button id="resetBtn" class="danger">Reset</button>
       </div>
 
-      <p class="hint">Your progress saves automatically in this browser. Miss more than one day and your current streak resets when you mark the next day complete.</p>
+      <div class="hint">Works offline after the first successful load from GitHub Pages. Your streak is saved on this phone/browser.</div>
     </section>
   </main>
 
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
-    const STORAGE_KEY = "day-streak-v1";
-    const els = {
-      nameInput: document.getElementById("nameInput"),
-      currentStreak: document.getElementById("currentStreak"),
-      streakLabel: document.getElementById("streakLabel"),
-      bestStreak: document.getElementById("bestStreak"),
-      lastCompleted: document.getElementById("lastCompleted"),
-      completeBtn: document.getElementById("completeBtn"),
-      undoBtn: document.getElementById("undoBtn"),
-      resetBtn: document.getElementById("resetBtn"),
-      status: document.getElementById("status"),
-      toast: document.getElementById("toast")
-    };
+    const STORAGE_KEY = "day-streak-offline-v1";
 
     const defaultState = {
       name: "My Streak",
@@ -320,6 +252,20 @@
     };
 
     let state = loadState();
+
+    const els = {
+      nameInput: document.getElementById("nameInput"),
+      currentStreak: document.getElementById("currentStreak"),
+      streakLabel: document.getElementById("streakLabel"),
+      status: document.getElementById("status"),
+      bestStreak: document.getElementById("bestStreak"),
+      lastCompleted: document.getElementById("lastCompleted"),
+      completeBtn: document.getElementById("completeBtn"),
+      undoBtn: document.getElementById("undoBtn"),
+      resetBtn: document.getElementById("resetBtn"),
+      toast: document.getElementById("toast"),
+      connection: document.getElementById("connection")
+    };
 
     function todayKey() {
       const now = new Date();
@@ -356,7 +302,8 @@
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (!raw) return { ...defaultState };
-        return { ...defaultState, ...JSON.parse(raw) };
+        const parsed = JSON.parse(raw);
+        return { ...defaultState, ...parsed, history: Array.isArray(parsed.history) ? parsed.history : [] };
       } catch {
         return { ...defaultState };
       }
@@ -423,6 +370,7 @@
       state.best = Math.max(state.best, state.current);
       state.lastCompletedDate = today;
       if (!state.history.includes(today)) state.history.push(today);
+      state.history.sort();
       saveState();
       render();
       showToast("Streak updated.");
@@ -432,7 +380,7 @@
       const today = todayKey();
       if (!todayCompleted()) return;
 
-      state.history = state.history.filter(date => date !== today);
+      state.history = state.history.filter(date => date !== today).sort();
       const previousDate = state.history[state.history.length - 1] || null;
       state.lastCompletedDate = previousDate;
 
@@ -461,6 +409,21 @@
       showToast("Streak reset.");
     }
 
+    function updateConnectionLabel() {
+      els.connection.className = "connection";
+      if (!navigator.onLine) {
+        els.connection.textContent = "Offline";
+        els.connection.classList.add("offline");
+        return;
+      }
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        els.connection.textContent = "Offline ready";
+        els.connection.classList.add("ready");
+      } else {
+        els.connection.textContent = "Online";
+      }
+    }
+
     els.nameInput.addEventListener("input", () => {
       state.name = els.nameInput.value.trim() || "My Streak";
       saveState();
@@ -469,12 +432,26 @@
     els.completeBtn.addEventListener("click", completeToday);
     els.undoBtn.addEventListener("click", undoToday);
     els.resetBtn.addEventListener("click", resetStreak);
+    window.addEventListener("online", updateConnectionLabel);
+    window.addEventListener("offline", updateConnectionLabel);
 
     render();
+    updateConnectionLabel();
 
     if ("serviceWorker" in navigator && location.protocol !== "file:") {
-      window.addEventListener("load", () => {
-        navigator.serviceWorker.register("sw.js").catch(() => {});
+      window.addEventListener("load", async () => {
+        try {
+          const registration = await navigator.serviceWorker.register("service-worker.js", { scope: "./" });
+          await navigator.serviceWorker.ready;
+          updateConnectionLabel();
+          if (!localStorage.getItem("day-streak-offline-ready-toast")) {
+            localStorage.setItem("day-streak-offline-ready-toast", "yes");
+            showToast("Offline mode is ready.");
+          }
+          registration.update();
+        } catch {
+          updateConnectionLabel();
+        }
       });
     }
   </script>
